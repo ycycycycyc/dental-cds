@@ -1,7 +1,7 @@
 # Dental Clinical Decision Support System
 ### 牙科临床决策支持系统
 
-> **Live site →** `https://<your-github-username>.github.io/dental-cds/`
+> **Live site →** `https://ycycycycyc.github.io/dental-cds/`
 
 An open, evidence-based clinical decision support tool for dental diagnosis and treatment planning. Structured knowledge base covering 32 dental condition groups with bilingual (Chinese/English) web interface, ICD-10 billing mapping, and safety red flags.
 
@@ -9,7 +9,7 @@ An open, evidence-based clinical decision support tool for dental diagnosis and 
 
 ## Try it
 
-**[→ Open the web tool](https://<your-github-username>.github.io/dental-cds/)**
+**[→ Open the web tool](https://ycycycycyc.github.io/dental-cds/)**
 
 No installation. Works in any modern browser, online or offline once loaded.
 
