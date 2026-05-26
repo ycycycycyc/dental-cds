@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dental Clinical Decision Support | 牙科临床决策支持</title>
+<meta name="description" content="Evidence-based dental diagnosis-to-treatment decision support. 32 clinical groups, 155 pathways, ICD-10 billing codes, red flag safety rules.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --surface-2: #f0efe9;
+  --surface-3: #e8e7e0;
+  --border: rgba(0,0,0,0.09);
+  --border-med: rgba(0,0,0,0.16);
+  --text: #18180f;
+  --text-2: #57564f;
+  --text-3: #96958c;
+  --blue: #185FA5;
+  --blue-bg: #e8f1fb;
+  --blue-text: #0c447c;
+  --green: #1a9069;
+  --green-bg: #e5f4ed;
+  --amber: #b06e12;
+  --amber-bg: #fdf0da;
+  --red: #c93a3a;
+  --red-bg: #fdeaea;
+  --purple: #6243c4;
+  --purple-bg: #eeebfc;
+  --radius: 8px;
+  --radius-lg: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06);
+  --header-h: 56px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #18180f;
+    --surface: #222219;
+    --surface-2: #2a2a20;
+    --surface-3: #32322a;
+    --border: rgba(255,255,255,0.09);
+    --border-med: rgba(255,255,255,0.16);
+    --text: #f0efe8;
+    --text-2: #aaa99e;
+    --text-3: #6b6a62;
+    --blue: #4a9de0;
+    --blue-bg: #0d2640;
+    --blue-text: #7fc4f5;
+    --green: #2abd89;
+    --green-bg: #082918;
+    --amber: #e09030;
+    --amber-bg: #2a1800;
+    --red: #e05050;
+    --red-bg: #2a0a0a;
+    --purple: #9b80f0;
+    --purple-bg: #1a1040;
+    --shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+}
+body { font-family: -apple-system,'PingFang SC','Helvetica Neue',sans-serif; background:var(--bg); color:var(--text); font-size:15px; line-height:1.6; min-height:100vh; }
+
+/* ── HEADER ── */
+header { position:sticky; top:0; z-index:100; height:var(--header-h); background:var(--surface); border-bottom:0.5px solid var(--border); display:flex; align-items:center; padding:0 20px; gap:16px; }
+.logo { display:flex; align-items:center; gap:9px; text-decoration:none; color:var(--text); font-weight:500; font-size:15px; }
+.logo-icon { width:32px; height:32px; background:var(--blue-bg); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--blue); font-size:18px; flex-shrink:0; }
+.logo-sub { font-size:12px; color:var(--text-3); font-weight:400; }
+nav { display:flex; align-items:center; gap:2px; margin-left:auto; }
+nav a { padding:6px 12px; border-radius:var(--radius); font-size:13px; color:var(--text-2); text-decoration:none; transition:all .15s; }
+nav a:hover { background:var(--surface-2); color:var(--text); }
+nav a.active { background:var(--blue-bg); color:var(--blue-text); }
+#langBtn { margin-left:8px; padding:5px 12px; border-radius:var(--radius); border:0.5px solid var(--border-med); background:var(--surface); color:var(--text-2); cursor:pointer; font-size:13px; font-family:inherit; transition:all .15s; }
+#langBtn:hover { background:var(--surface-2); }
+
+/* ── LAYOUT ── */
+.page { display:none; }
+.page.active { display:block; }
+.container { max-width:1100px; margin:0 auto; padding:28px 20px; }
+
+/* ── HOME ── */
+.hero { text-align:center; padding:40px 0 32px; }
+.hero h1 { font-size:28px; font-weight:500; margin-bottom:8px; }
+.hero p { font-size:16px; color:var(--text-2); max-width:560px; margin:0 auto 28px; }
+.hero-cta { display:inline-flex; align-items:center; gap:8px; padding:10px 24px; background:var(--blue); color:#fff; border-radius:var(--radius); text-decoration:none; font-size:14px; font-weight:500; transition:opacity .15s; }
+.hero-cta:hover { opacity:.88; }
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:28px 0; }
+@media(max-width:680px){ .stats-grid { grid-template-columns:repeat(2,1fr); } }
+.stat-card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:16px; text-align:center; }
+.stat-num { font-size:26px; font-weight:500; color:var(--blue); }
+.stat-label { font-size:12px; color:var(--text-3); margin-top:2px; }
+.domain-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; }
+.domain-card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:14px 16px; cursor:pointer; transition:all .15s; text-decoration:none; display:block; }
+.domain-card:hover { border-color:var(--blue); background:var(--blue-bg); }
+.domain-icon { font-size:20px; color:var(--blue); margin-bottom:6px; }
+.domain-name { font-size:14px; font-weight:500; }
+.domain-count { font-size:12px; color:var(--text-3); margin-top:2px; }
+.section-title { font-size:13px; font-weight:500; text-transform:uppercase; letter-spacing:.06em; color:var(--text-3); margin:28px 0 12px; }
+.disclaimer { margin-top:32px; padding:14px 16px; background:var(--amber-bg); border:0.5px solid var(--amber); border-radius:var(--radius); font-size:13px; color:var(--amber); }
+
+/* ── TOOL ── */
+.tool-layout { display:grid; grid-template-columns:220px 1fr 300px; gap:16px; align-items:start; }
+@media(max-width:900px){ .tool-layout { grid-template-columns:1fr; } }
+.sidebar { position:sticky; top:calc(var(--header-h) + 16px); }
+.sidebar-section { font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.06em; color:var(--text-3); margin:16px 0 6px; }
+.sidebar-section:first-child { margin-top:0; }
+.domain-filter { display:flex; flex-direction:column; gap:2px; }
+.df-btn { padding:6px 10px; border-radius:var(--radius); font-size:13px; color:var(--text-2); background:none; border:none; cursor:pointer; text-align:left; font-family:inherit; transition:all .12s; display:flex; align-items:center; gap:6px; }
+.df-btn:hover { background:var(--surface-2); }
+.df-btn.active { background:var(--blue-bg); color:var(--blue-text); }
+.df-badge { margin-left:auto; font-size:10px; background:var(--surface-3); color:var(--text-3); padding:1px 6px; border-radius:10px; }
+.group-list { display:flex; flex-direction:column; gap:6px; }
+.g-btn { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--radius); padding:10px 12px; cursor:pointer; text-align:left; font-family:inherit; transition:all .12s; width:100%; }
+.g-btn:hover { border-color:var(--blue); }
+.g-btn.active { border-color:var(--blue); background:var(--blue-bg); }
+.g-btn-name { font-size:13px; font-weight:500; }
+.g-btn-meta { font-size:11px; color:var(--text-3); margin-top:2px; display:flex; gap:8px; }
+.urgency-dot { width:6px; height:6px; border-radius:50%; display:inline-block; flex-shrink:0; margin-top:4px; }
+.u-emergency { background:#d43f3f; }
+.u-urgent { background:#c07820; }
+.u-scheduled { background:#1a9069; }
+.g-btn-name-wrap { display:flex; align-items:flex-start; gap:7px; }
+
+/* Questions panel */
+.q-panel { display:flex; flex-direction:column; gap:10px; }
+.q-empty { text-align:center; padding:60px 20px; color:var(--text-3); font-size:14px; }
+.q-empty i { font-size:36px; display:block; margin-bottom:10px; }
+.progress-bar { height:3px; background:var(--surface-3); border-radius:2px; margin-bottom:16px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--blue); border-radius:2px; transition:width .3s; }
+.q-card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:14px 16px; }
+.q-card.answered { opacity:.55; }
+.q-card.current { border-color:var(--blue); }
+.q-meta { font-size:11px; color:var(--text-3); margin-bottom:4px; }
+.q-text { font-size:14px; font-weight:500; line-height:1.45; margin-bottom:10px; }
+.q-note { font-size:12px; color:var(--text-3); margin-top:6px; font-style:italic; }
+.ans-badge { display:inline-block; margin-left:7px; font-size:11px; padding:2px 8px; border-radius:var(--radius); background:var(--blue-bg); color:var(--blue-text); font-weight:400; }
+.opts { display:flex; flex-direction:column; gap:5px; }
+.opt { display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:var(--radius); border:0.5px solid var(--border); cursor:pointer; font-size:13px; background:var(--surface); transition:background .1s; font-family:inherit; width:100%; text-align:left; }
+.opt:hover { background:var(--surface-2); }
+.opt.sel { border-color:var(--blue); background:var(--blue-bg); color:var(--blue-text); }
+.opt input { accent-color:var(--blue); flex-shrink:0; }
+.q-reset { margin-top:10px; padding:5px 14px; border-radius:var(--radius); border:0.5px solid var(--border-med); background:var(--surface); color:var(--text-2); cursor:pointer; font-size:12px; font-family:inherit; }
+
+/* Results panel */
+.results-panel { position:sticky; top:calc(var(--header-h) + 16px); display:flex; flex-direction:column; gap:10px; }
+.r-card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:14px 16px; }
+.r-title { font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.06em; color:var(--text-3); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.r-empty { font-size:13px; color:var(--text-3); }
+.pathway { padding:9px 12px; border-radius:var(--radius); border:0.5px solid var(--border); border-left:3px solid var(--border-med); margin-bottom:6px; font-size:13px; }
+.pathway:last-child { margin-bottom:0; }
+.pathway.first_line { border-left-color:var(--green); }
+.pathway.escalation { border-left-color:var(--amber); background:var(--amber-bg); }
+.pathway.red_flag { border-left-color:var(--red); background:var(--red-bg); }
+.p-treat { font-weight:500; line-height:1.45; }
+.p-id { font-size:11px; color:var(--text-3); margin-top:3px; }
+.flag-row { padding:9px 12px; border-radius:var(--radius); border:0.5px solid; border-left:3px solid; margin-bottom:6px; font-size:13px; }
+.flag-row:last-child { margin-bottom:0; }
+.flag-emergency,.flag-block { border-color:rgba(201,58,58,.25); border-left-color:var(--red); background:var(--red-bg); }
+.flag-caution { border-color:rgba(176,110,18,.25); border-left-color:var(--amber); background:var(--amber-bg); }
+.flag-name { font-weight:500; }
+.flag-action { font-size:12px; color:var(--text-2); margin-top:3px; line-height:1.55; }
+.bill-row { display:flex; align-items:flex-start; gap:8px; padding:5px 0; font-size:12px; border-bottom:0.5px solid var(--border); }
+.bill-row:last-child { border-bottom:none; padding-bottom:0; }
+.icd { font-family:'Courier New',monospace; font-size:11px; background:var(--surface-2); padding:2px 6px; border-radius:4px; white-space:nowrap; flex-shrink:0; margin-top:1px; }
+.bill-desc { flex:1; color:var(--text-2); line-height:1.4; }
+.bill-pri { font-size:10px; color:var(--text-3); white-space:nowrap; }
+.legend-strip { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.legend-item { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text-3); }
+.legend-bar { width:10px; height:10px; border-radius:2px; }
+.lb-first { background:var(--green); }
+.lb-esc { background:var(--amber); }
+.lb-flag { background:var(--red); }
+
+/* ── BROWSER ── */
+.browser-controls { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+.search-wrap { flex:1; min-width:200px; position:relative; }
+.search-wrap i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:16px; pointer-events:none; }
+#searchInput { width:100%; padding:8px 12px 8px 34px; border-radius:var(--radius); border:0.5px solid var(--border-med); background:var(--surface); color:var(--text); font-size:14px; font-family:inherit; outline:none; }
+#searchInput:focus { border-color:var(--blue); }
+.domain-chips { display:flex; gap:6px; flex-wrap:wrap; }
+.d-chip { padding:5px 12px; border-radius:var(--radius); border:0.5px solid var(--border-med); font-size:12px; cursor:pointer; background:var(--surface); color:var(--text-2); font-family:inherit; transition:all .12s; }
+.d-chip:hover { background:var(--surface-2); }
+.d-chip.active { border-color:var(--blue); background:var(--blue-bg); color:var(--blue-text); }
+.browser-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px; }
+.b-card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
+.b-card-head { padding:14px 16px; cursor:pointer; display:flex; align-items:flex-start; gap:12px; }
+.b-card-head:hover { background:var(--surface-2); }
+.b-card-info { flex:1; min-width:0; }
+.b-card-name { font-size:14px; font-weight:500; line-height:1.35; }
+.b-card-sub { font-size:12px; color:var(--text-3); margin-top:3px; }
+.b-card-badges { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.badge { font-size:11px; padding:2px 8px; border-radius:10px; }
+.badge-domain { background:var(--purple-bg); color:var(--purple); }
+.badge-urgency-emergency { background:var(--red-bg); color:var(--red); }
+.badge-urgency-urgent { background:var(--amber-bg); color:var(--amber); }
+.badge-urgency-scheduled { background:var(--green-bg); color:var(--green); }
+.badge-count { background:var(--surface-2); color:var(--text-3); }
+.b-card-expand { padding:0 16px 14px; border-top:0.5px solid var(--border); display:none; }
+.b-card-expand.open { display:block; }
+.expand-section { margin-top:12px; }
+.expand-title { font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.05em; color:var(--text-3); margin-bottom:7px; }
+.b-pathway { font-size:12px; padding:6px 10px; border-radius:var(--radius); border-left:3px solid var(--border-med); background:var(--surface-2); margin-bottom:4px; }
+.b-pathway.first_line { border-left-color:var(--green); }
+.b-pathway.escalation { border-left-color:var(--amber); }
+.b-pathway.red_flag { border-left-color:var(--red); }
+.b-flag { font-size:12px; padding:6px 10px; border-radius:var(--radius); border-left:3px solid; margin-bottom:4px; }
+.b-flag.caution { border-left-color:var(--amber); background:var(--amber-bg); }
+.b-flag.block, .b-flag.emergency { border-left-color:var(--red); background:var(--red-bg); }
+.b-billing { font-size:12px; padding:4px 0; border-bottom:0.5px solid var(--border); display:flex; gap:8px; }
+.b-billing:last-child { border-bottom:none; }
+.no-results { text-align:center; padding:40px; color:var(--text-3); grid-column:1/-1; }
+
+/* ── MISC ── */
+.chip-urgency { display:inline-flex; align-items:center; gap:4px; font-size:11px; }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#home">
+    <div class="logo-icon"><i class="ti ti-stethoscope" aria-hidden="true"></i></div>
+    <div>
+      <div class="logo-name" data-en="Dental CDS" data-cn="牙科临床决策">Dental CDS</div>
+      <div class="logo-sub" data-en="Clinical Decision Support" data-cn="诊断至治疗知识库">Clinical Decision Support</div>
+    </div>
+  </a>
+  <nav>
+    <a href="#home" class="nav-link" data-en="Home" data-cn="首页">Home</a>
+    <a href="#tool" class="nav-link" data-en="Clinical Tool" data-cn="临床工具">Clinical Tool</a>
+    <a href="#browser" class="nav-link" data-en="Data Browser" data-cn="数据浏览">Data Browser</a>
+  </nav>
+  <button id="langBtn">中文</button>
+</header>
+
+<!-- ══ HOME ══ -->
+<div id="page-home" class="page active">
+<div class="container">
+  <div class="hero">
+    <h1 data-en="Dental Clinical Decision Support" data-cn="牙科临床决策支持系统"></h1>
+    <p data-en="Evidence-based, structured clinical decision support covering diagnosis, treatment selection, ICD-10 billing, and safety red flags across 32 dental condition groups." data-cn="基于循证医学的结构化临床决策支持系统，涵盖32个牙科诊断组的治疗选择、ICD-10计费编码及安全红色警报。"></p>
+    <a href="#tool" class="hero-cta">
+      <i class="ti ti-player-play" aria-hidden="true"></i>
+      <span data-en="Start Clinical Intake" data-cn="开始临床采集"></span>
+    </a>
+  </div>
+
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <div class="section-title" data-en="Clinical Domains" data-cn="临床领域"></div>
+  <div class="domain-grid" id="domainGrid"></div>
+
+  <div class="disclaimer" style="margin-top:28px">
+    <strong data-en="⚠ Clinical use notice" data-cn="⚠ 临床使用声明"></strong><br>
+    <span data-en="This system is a decision support aid only. All treatment decisions must be made by a qualified clinician based on the individual patient's full clinical presentation. Always apply professional judgement and consult current guidelines." data-cn="本系统仅为临床决策辅助工具，不能替代执业医师的临床判断。所有治疗决策须由具备资质的临床医师根据患者具体情况作出，并参照现行临床指南。"></span>
+  </div>
+</div>
+</div>
+
+<!-- ══ TOOL ══ -->
+<div id="page-tool" class="page">
+<div class="container">
+  <div class="tool-layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section" data-en="Domain" data-cn="临床领域"></div>
+      <div class="domain-filter" id="domainFilter"></div>
+      <div class="sidebar-section" style="margin-top:16px" data-en="Condition group" data-cn="诊断组"></div>
+      <div class="group-list" id="groupList"></div>
+    </div>
+
+    <!-- Questions -->
+    <div>
+      <div class="legend-strip">
+        <div class="legend-item"><div class="legend-bar lb-first"></div><span data-en="First-line" data-cn="一线治疗"></span></div>
+        <div class="legend-item"><div class="legend-bar lb-esc"></div><span data-en="Escalation" data-cn="升级转诊"></span></div>
+        <div class="legend-item"><div class="legend-bar lb-flag"></div><span data-en="Red flag" data-cn="红色警报"></span></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="q-panel" id="qPanel">
+        <div class="q-empty">
+          <i class="ti ti-list-check" aria-hidden="true"></i>
+          <div data-en="Select a condition group from the left to begin." data-cn="请从左侧选择诊断组，开始临床采集。"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="results-panel" id="resultsPanel">
+      <div class="r-card">
+        <div class="r-title"><i class="ti ti-chart-bar" aria-hidden="true"></i><span data-en="Results" data-cn="结果"></span></div>
+        <p class="r-empty" data-en="Answers will generate matched pathways, billing codes, and red flags here." data-cn="作答后将在此显示匹配路径、计费编码及红色警报。"></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══ BROWSER ══ -->
+<div id="page-browser" class="page">
+<div class="container">
+  <div class="browser-controls">
+    <div class="search-wrap">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      <input type="text" id="searchInput" placeholder="Search groups, pathways, ICD codes…" autocomplete="off">
+    </div>
+    <div class="domain-chips" id="browserDomainChips"></div>
+  </div>
+  <div class="browser-grid" id="browserGrid"></div>
+</div>
+</div>
+
+<script src="data.js"></script>
+<script>
+// ── LANGUAGE ──────────────────────────────────────────────────────────────────
+let lang = localStorage.getItem('lang') || 'en';
+const t = (en, cn) => lang === 'cn' ? cn : en;
+
+function applyLang() {
+  document.documentElement.lang = lang === 'cn' ? 'zh-CN' : 'en';
+  document.querySelectorAll('[data-en]').forEach(el => {
+    el.textContent = lang === 'cn' ? (el.dataset.cn || el.dataset.en) : el.dataset.en;
+  });
+  document.getElementById('langBtn').textContent = lang === 'cn' ? 'EN' : '中文';
+  const si = document.getElementById('searchInput');
+  if (si) si.placeholder = lang === 'cn' ? '搜索诊断组、治疗路径、ICD编码…' : 'Search groups, pathways, ICD codes…';
+}
+
+document.getElementById('langBtn').onclick = () => {
+  lang = lang === 'en' ? 'cn' : 'en';
+  localStorage.setItem('lang', lang);
+  applyLang();
+  renderAll();
+};
+
+// ── ROUTER ────────────────────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  const link = document.querySelector(`.nav-link[href="#${id}"]`);
+  if (page) page.classList.add('active');
+  if (link) link.classList.add('active');
+}
+
+window.addEventListener('hashchange', () => {
+  const h = location.hash.replace('#','') || 'home';
+  showPage(h);
+});
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', () => {
+    const h = a.getAttribute('href').replace('#','') || 'home';
+    showPage(h);
+  });
+});
+
+// ── RULE ENGINE ───────────────────────────────────────────────────────────────
+const SYNONYMS = { permanent_tooth:'permanent', primary_tooth:'primary', permanent:'permanent_tooth', primary:'primary_tooth' };
+
+function tokenize(rule) {
+  const toks = [];
+  for (const part of rule.trim().split(/\s+/)) {
+    let s = part; const suf = [];
+    while (s.startsWith('(')) { toks.push('('); s = s.slice(1); }
+    while (s.endsWith(')')) { suf.push(')'); s = s.slice(0, -1); }
+    if (s) toks.push(s);
+    toks.push(...suf);
+  }
+  return toks.filter(Boolean);
+}
+
+function evalRule(rule, ans) {
+  if (!rule || !rule.trim()) return true;
+  const toks = tokenize(rule);
+  let pos = 0;
+  const peek = () => toks[pos];
+  const eat  = () => toks[pos++];
+  function parseOr()  { let v = parseAnd(); while (peek()==='OR')  { eat(); v = parseAnd() || v; } return v; }
+  function parseAnd() { let v = parseAtom(); while (peek()==='AND') { eat(); v = parseAtom() && v; } return v; }
+  function parseAtom() {
+    if (peek() === '(') { eat(); const v = parseOr(); eat(); return v; }
+    const t = eat() || '';
+    const normVal = v => SYNONYMS[v] ? [v, SYNONYMS[v]] : [v];
+    if (t.includes('!=')) { const [d, v] = t.split('!='); const av = ans[d] || ''; return normVal(v).every(nv => av !== nv); }
+    if (t.includes('='))  { const [d, v] = t.split('=');  const av = ans[d] || ''; return normVal(v).some(nv => av === nv); }
+    return false;
+  }
+  return parseOr();
+}
+
+// ── DATA HELPERS ──────────────────────────────────────────────────────────────
+const D = window.DENTAL_DATA;
+
+function groupName(g)   { return lang === 'cn' ? g.name_cn : g.name_en; }
+function pathwayTreat(p){ return lang === 'cn' ? p.treat_cn : p.treat_en; }
+function qText(q)       { return lang === 'cn' ? q.q_cn : q.q_en; }
+function qLabel(q, i)   { return lang === 'cn' ? q.labels_cn[i] : q.labels_en[i]; }
+function flagName(f)    { return lang === 'cn' ? f.name_cn : f.name_en; }
+function flagAction(f)  { return lang === 'cn' ? f.action_cn : f.action_en; }
+function billDesc(b)    { return lang === 'cn' ? b.desc_cn : b.desc_en; }
+function esc(s)         { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function lineLabel(line){ return { first_line: t('First-line','一线治疗'), escalation: t('Escalation','升级转诊'), red_flag: t('Red flag','红色警报') }[line] || line; }
+
+const DOMAINS = [...new Set(D.groups.map(g => g.domain))].sort();
+const DOMAIN_ICONS = {
+  'Caries':'ti-circle-dot','Pulpal':'ti-heartbeat','Periodontal':'ti-chart-area',
+  'Hard Tissue':'ti-layers-subtract','Impaction':'ti-arrows-maximize',
+  'Malocclusion':'ti-arrows-sort','Mucosal':'ti-medical-cross',
+  'Prosthetics':'ti-device-heart','Developmental':'ti-dna-2','Cross-category':'ti-bolt',
+};
+const DOMAIN_CN = {
+  'Caries':'龋病','Pulpal':'牙髓病','Periodontal':'牙周病',
+  'Hard Tissue':'硬组织','Impaction':'阻生牙','Malocclusion':'错殆/TMJ',
+  'Mucosal':'口腔黏膜','Prosthetics':'修复/种植','Developmental':'发育异常','Cross-category':'外伤',
+};
+
+function domainName(d) { return lang === 'cn' ? (DOMAIN_CN[d] || d) : d; }
+function domainIcon(d)  { return DOMAIN_ICONS[d] || 'ti-circle'; }
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+function renderHome() {
+  // Stats
+  const sg = document.getElementById('statsGrid');
+  sg.innerHTML = [
+    [D.meta.groups,      t('Condition groups','诊断组')],
+    [D.meta.questions,   t('Clinical questions','临床问题')],
+    [D.meta.pathways,    t('Treatment pathways','治疗路径')],
+    [D.meta.billing_rules, t('Billing rules (ICD-10)','计费规则 (ICD-10)')],
+  ].map(([n, l]) => `<div class="stat-card"><div class="stat-num">${n}</div><div class="stat-label">${l}</div></div>`).join('');
+
+  // Domain grid
+  const dg = document.getElementById('domainGrid');
+  dg.innerHTML = DOMAINS.map(d => {
+    const count = D.groups.filter(g => g.domain === d).length;
+    const icon = domainIcon(d);
+    return `<a class="domain-card" href="#tool" onclick="setDomainFilter('${d}')">
+      <div class="domain-icon"><i class="ti ${icon}" aria-hidden="true"></i></div>
+      <div class="domain-name">${domainName(d)}</div>
+      <div class="domain-count">${count} ${t('groups','个诊断组')}</div>
+    </a>`;
+  }).join('');
+}
+
+// ── TOOL STATE ─────────────────────────────────────────────────────────────────
+let toolState = { domain: 'all', group: null, answers: {} };
+
+function setDomainFilter(d) {
+  toolState.domain = d;
+  toolState.group = null;
+  toolState.answers = {};
+  showPage('tool');
+  renderTool();
+}
+
+function renderTool() {
+  renderDomainFilter();
+  renderGroupList();
+  renderQuestions();
+  renderResults();
+}
+
+function renderDomainFilter() {
+  const el = document.getElementById('domainFilter');
+  const allLabel = t('All domains', '全部领域');
+  let html = `<button class="df-btn ${toolState.domain==='all'?'active':''}" onclick="setDomainFilter('all')">${allLabel}<span class="df-badge">${D.groups.length}</span></button>`;
+  html += DOMAINS.map(d => {
+    const count = D.groups.filter(g => g.domain === d).length;
+    return `<button class="df-btn ${toolState.domain===d?'active':''}" onclick="setDomainFilter('${d}')">
+      <i class="ti ${domainIcon(d)}" aria-hidden="true" style="font-size:13px"></i>${domainName(d)}<span class="df-badge">${count}</span>
+    </button>`;
+  }).join('');
+  el.innerHTML = html;
+}
+
+function renderGroupList() {
+  const el = document.getElementById('groupList');
+  const filtered = toolState.domain === 'all' ? D.groups : D.groups.filter(g => g.domain === toolState.domain);
+  el.innerHTML = filtered.map(g => {
+    const qs = (D.questions[g.code] || []).length;
+    const ps = (D.pathways[g.code] || []).length;
+    const isActive = toolState.group === g.code;
+    return `<button class="g-btn ${isActive?'active':''}" onclick="selectGroup('${g.code}')">
+      <div class="g-btn-name-wrap">
+        <span class="urgency-dot u-${g.urgency}"></span>
+        <span class="g-btn-name">${groupName(g)}</span>
+      </div>
+      <div class="g-btn-meta"><span>${g.code}</span><span>${qs} ${t('Qs','题')}</span><span>${ps} ${t('paths','路径')}</span></div>
+    </button>`;
+  }).join('');
+}
+
+function selectGroup(code) {
+  toolState.group = code;
+  toolState.answers = {};
+  renderGroupList();
+  renderQuestions();
+  renderResults();
+}
+
+function renderQuestions() {
+  const panel = document.getElementById('qPanel');
+  const pf    = document.getElementById('progressFill');
+  if (!toolState.group) {
+    panel.innerHTML = `<div class="q-empty"><i class="ti ti-list-check" aria-hidden="true"></i><div>${t('Select a condition group from the left to begin.','请从左侧选择诊断组，开始临床采集。')}</div></div>`;
+    pf.style.width = '0%';
+    return;
+  }
+  const qs = D.questions[toolState.group] || [];
+  const ans = toolState.answers;
+  let firstUnanswered = -1;
+  qs.forEach((q, i) => { if (!(q.dim in ans) && firstUnanswered === -1) firstUnanswered = i; });
+  const answered = qs.filter(q => q.dim in ans).length;
+  pf.style.width = qs.length ? Math.round(answered / qs.length * 100) + '%' : '0%';
+
+  let html = '';
+  qs.forEach((q, i) => {
+    const isCurrent  = i === firstUnanswered;
+    const isAnswered = q.dim in ans;
+    if (i > firstUnanswered && !isAnswered) return;
+    const badge = isAnswered ? `<span class="ans-badge">${qLabel(q, q.opts.indexOf(ans[q.dim]))}</span>` : '';
+    let optsHtml = '';
+    if (isCurrent) {
+      optsHtml = '<div class="opts">' + q.opts.map((val, j) =>
+        `<button class="opt ${ans[q.dim]===val?'sel':''}" onclick="setAnswer('${esc(q.dim)}','${esc(val)}')" type="button">
+          <input type="radio" name="${esc(q.dim)}" ${ans[q.dim]===val?'checked':''}>${qLabel(q,j)}
+        </button>`
+      ).join('') + '</div>';
+      const note = lang === 'cn' ? q.note_cn : q.note_en;
+      if (note) optsHtml += `<div class="q-note">${note}</div>`;
+    }
+    html += `<div class="q-card ${isAnswered&&!isCurrent?'answered':''} ${isCurrent?'current':''}">
+      <div class="q-meta">${t('Q','第')}${i+1} ${t('of','/')}${qs.length} · ${q.id}</div>
+      <div class="q-text">${qText(q)}${badge}</div>
+      ${optsHtml}
+    </div>`;
+  });
+
+  if (firstUnanswered === -1 && qs.length > 0) {
+    pf.style.width = '100%';
+    html += `<button class="q-reset" onclick="selectGroup('${toolState.group}')">↺ ${t('Reset answers','重置答案')}</button>`;
+  }
+  panel.innerHTML = html;
+}
+
+function setAnswer(dim, val) {
+  toolState.answers[dim] = val;
+  renderQuestions();
+  renderResults();
+}
+
+function renderResults() {
+  const panel = document.getElementById('resultsPanel');
+  if (!toolState.group) {
+    panel.innerHTML = `<div class="r-card"><div class="r-title"><i class="ti ti-chart-bar"></i>${t('Results','结果')}</div><p class="r-empty">${t('Answers will generate matched pathways, billing codes, and red flags here.','作答后将在此显示匹配路径、计费编码及红色警报。')}</p></div>`;
+    return;
+  }
+  const ans = toolState.answers;
+  const pathways = D.pathways[toolState.group] || [];
+  const flags    = D.red_flags[toolState.group] || [];
+  const matched  = pathways.filter(p => evalRule(p.rule, ans));
+  const activeFlags = flags.filter(f => ans[f.dim] === f.val || (SYNONYMS[ans[f.dim]] === f.val));
+
+  let html = '';
+
+  // Active flags
+  if (activeFlags.length) {
+    html += `<div class="r-card"><div class="r-title"><i class="ti ti-alert-triangle"></i>${t('Active red flags','活跃红色警报')}</div>`;
+    html += activeFlags.map(f => {
+      const sevIcon = {emergency:'ti-ambulance',block:'ti-alert-circle',caution:'ti-alert-triangle'}[f.severity]||'ti-alert-circle';
+      return `<div class="flag-row flag-${f.severity}"><div class="flag-name"><i class="ti ${sevIcon}" style="font-size:13px;margin-right:4px"></i>${flagName(f)}</div><div class="flag-action">${flagAction(f)}</div></div>`;
+    }).join('');
+    html += '</div>';
+  }
+
+  // Pathways
+  html += `<div class="r-card"><div class="r-title"><i class="ti ti-stethoscope"></i>${t('Matched pathways','匹配治疗路径')}</div>`;
+  if (!matched.length) {
+    html += `<p class="r-empty">${Object.keys(ans).length === 0 ? t('Answer questions to see pathways.','请回答问题以查看治疗路径。') : t('No complete match yet — keep answering.','暂无完整匹配——请继续回答。')}</p>`;
+  } else {
+    html += matched.map(p =>
+      `<div class="pathway ${p.line}"><div class="p-treat">${pathwayTreat(p)}</div><div class="p-id">${p.id} · ${lineLabel(p.line)}</div></div>`
+    ).join('');
+  }
+  html += '</div>';
+
+  // Billing
+  const bills = [];
+  matched.forEach(p => {
+    (D.billing[p.id] || []).forEach(b => {
+      if (!b.filter || evalRule(b.filter, ans)) bills.push(b);
+    });
+  });
+  if (bills.length) {
+    html += `<div class="r-card"><div class="r-title"><i class="ti ti-receipt"></i>${t('ICD-10 billing codes','ICD-10 计费编码')}</div>`;
+    html += bills.map(b =>
+      `<div class="bill-row"><span class="icd">${b.code}</span><span class="bill-desc">${billDesc(b)}</span><span class="bill-pri">${b.priority}</span></div>`
+    ).join('');
+    html += '</div>';
+  }
+
+  // Collected answers (if any matches)
+  if (Object.keys(ans).length > 0 && matched.length > 0) {
+    html += `<div class="r-card"><div class="r-title"><i class="ti ti-key"></i>${t('Collected answers','已收集答案')}</div>`;
+    html += Object.entries(ans).map(([d, v]) =>
+      `<div class="bill-row"><span class="bill-desc" style="color:var(--text-3)">${d}</span><span style="font-size:12px;color:var(--text-2)">${v}</span></div>`
+    ).join('');
+    html += '</div>';
+  }
+
+  panel.innerHTML = html;
+}
+
+// ── BROWSER ───────────────────────────────────────────────────────────────────
+let browserState = { domain: 'all', search: '', expanded: null };
+
+function renderBrowser() {
+  renderBrowserChips();
+  renderBrowserGrid();
+}
+
+function renderBrowserChips() {
+  const el = document.getElementById('browserDomainChips');
+  el.innerHTML = `<button class="d-chip ${browserState.domain==='all'?'active':''}" onclick="setBrowserDomain('all')">${t('All','全部')}</button>` +
+    DOMAINS.map(d => `<button class="d-chip ${browserState.domain===d?'active':''}" onclick="setBrowserDomain('${d}')">${domainName(d)}</button>`).join('');
+}
+
+function setBrowserDomain(d) {
+  browserState.domain = d;
+  browserState.expanded = null;
+  renderBrowserChips();
+  renderBrowserGrid();
+}
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  browserState.search = e.target.value.toLowerCase();
+  browserState.expanded = null;
+  renderBrowserGrid();
+});
+
+function renderBrowserGrid() {
+  const el = document.getElementById('browserGrid');
+  let groups = D.groups;
+  if (browserState.domain !== 'all') groups = groups.filter(g => g.domain === browserState.domain);
+  if (browserState.search) {
+    const q = browserState.search;
+    groups = groups.filter(g => {
+      if (g.name_cn.toLowerCase().includes(q) || g.name_en.toLowerCase().includes(q)) return true;
+      if (g.code.toLowerCase().includes(q)) return true;
+      const ps = D.pathways[g.code] || [];
+      if (ps.some(p => p.treat_en.toLowerCase().includes(q) || p.treat_cn.includes(q))) return true;
+      const pathwayIds = new Set(ps.map(p => p.id));
+      const bs = Object.entries(D.billing).filter(([pid]) => pathwayIds.has(pid)).flatMap(([,items]) => items);
+      if (bs.some(b => b.code.toLowerCase().includes(q) || b.desc_en.toLowerCase().includes(q))) return true;
+      return false;
+    });
+  }
+  if (!groups.length) {
+    el.innerHTML = `<div class="no-results">${t('No results found.','未找到相关结果。')}</div>`;
+    return;
+  }
+  el.innerHTML = groups.map(g => {
+    const pathways = D.pathways[g.code] || [];
+    const flags    = D.red_flags[g.code] || [];
+    const bills    = pathways.flatMap(p => D.billing[p.id] || []);
+    const qs       = D.questions[g.code] || [];
+    const isOpen   = browserState.expanded === g.code;
+    const urgencyClass = `badge-urgency-${g.urgency}`;
+
+    let expandHtml = '';
+    if (isOpen) {
+      // Pathways
+      expandHtml += `<div class="expand-section"><div class="expand-title">${t('Treatment pathways','治疗路径')} (${pathways.length})</div>`;
+      expandHtml += pathways.map(p =>
+        `<div class="b-pathway ${p.line}"><strong>${p.id}</strong> · ${lineLabel(p.line)}<br>${pathwayTreat(p)}</div>`
+      ).join('');
+      expandHtml += '</div>';
+
+      // Red flags
+      if (flags.length) {
+        expandHtml += `<div class="expand-section"><div class="expand-title">${t('Red flags','红色警报')} (${flags.length})</div>`;
+        expandHtml += flags.map(f =>
+          `<div class="b-flag ${f.severity}"><strong>${flagName(f)}</strong><br>${flagAction(f)}</div>`
+        ).join('');
+        expandHtml += '</div>';
+      }
+
+      // Billing
+      if (bills.length) {
+        const uniq = [...new Map(bills.map(b => [b.code, b])).values()];
+        expandHtml += `<div class="expand-section"><div class="expand-title">${t('ICD-10 codes','ICD-10 编码')} (${uniq.length})</div>`;
+        expandHtml += uniq.map(b =>
+          `<div class="b-billing"><span class="icd">${b.code}</span><span style="flex:1;color:var(--text-2)">${billDesc(b)}</span></div>`
+        ).join('');
+        expandHtml += '</div>';
+      }
+
+      // Use in tool button
+      expandHtml += `<div style="margin-top:12px"><a href="#tool" class="hero-cta" style="font-size:12px;padding:6px 14px" onclick="selectGroupFromBrowser('${g.code}')"><i class="ti ti-player-play"></i>${t('Open in Clinical Tool','在临床工具中打开')}</a></div>`;
+    }
+
+    return `<div class="b-card">
+      <div class="b-card-head" onclick="toggleBrowserCard('${g.code}')">
+        <div class="b-card-info">
+          <div class="b-card-name">${groupName(g)}</div>
+          <div class="b-card-sub">${g.code} · ${g.k_codes}</div>
+          <div class="b-card-badges">
+            <span class="badge badge-domain">${domainName(g.domain)}</span>
+            <span class="badge ${urgencyClass}">${g.urgency}</span>
+            <span class="badge badge-count">${qs.length} ${t('Qs','题')}</span>
+            <span class="badge badge-count">${pathways.length} ${t('paths','路径')}</span>
+            ${flags.length ? `<span class="badge badge-urgency-emergency">${flags.length} ${t('flags','警报')}</span>` : ''}
+          </div>
+        </div>
+        <i class="ti ${isOpen?'ti-chevron-up':'ti-chevron-down'}" style="color:var(--text-3);font-size:16px;flex-shrink:0;margin-top:2px"></i>
+      </div>
+      <div class="b-card-expand ${isOpen?'open':''}">${expandHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleBrowserCard(code) {
+  browserState.expanded = browserState.expanded === code ? null : code;
+  renderBrowserGrid();
+}
+
+function selectGroupFromBrowser(code) {
+  toolState.group = code;
+  toolState.answers = {};
+  toolState.domain = D.groups.find(g => g.code === code)?.domain || 'all';
+  showPage('tool');
+  renderTool();
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderHome();
+  renderTool();
+  renderBrowser();
+  applyLang();
+}
+
+// Init
+const initHash = location.hash.replace('#','') || 'home';
+showPage(initHash);
+renderAll();
+</script>
+</body>
+</html>
